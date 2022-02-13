@@ -8,31 +8,46 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func main() {
-	gen := rand.New(rand.NewSource(100))
-	target := gen.Float64()
+	seconds := time.Now().Unix()
+	rand.Seed(seconds)
+	target := rand.Intn(100) + 1
+	//fmt.Println(target)
 
-	fmt.Println("Please input your guess:")
 	read := bufio.NewReader(os.Stdin)
-	input, err := read.ReadString('\n')
-	if err != nil {
-		log.Fatal(err)
-	}
+	success := false
 
-	var status string
-	input = strings.TrimSpace(input)
-	guess, err := strconv.ParseFloat(input, 64)
-	if err != nil {
-		log.Fatal(err)
+	//allow user 10 times to try
+	for count := 0; count < 10; count++ {
+		fmt.Printf("You have %d times to try", 10-count)
+		fmt.Println("\nPlease input your guess:")
+
+		input, err := read.ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var status string
+		input = strings.TrimSpace(input)
+		guess, err := strconv.Atoi(input)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if guess < target {
+			status = "Oops, your guess was LOW!"
+		} else if guess > target {
+			status = "Oops, your guess was HIGH!"
+		} else {
+			success = true
+			fmt.Println("Bingo, you did it!!!")
+			break
+		}
+		fmt.Println(status)
 	}
-	if guess < target {
-		status = "Oops, your guess was LOW!"
-	} else if guess > target {
-		status = "Oops, your guess was HIGH!"
-	} else {
-		status = "Bingo, you did it!!!"
+	if !success {
+		fmt.Println("Sorry, you did not guess my number. it was: ", target)
 	}
-	fmt.Println(status)
 }
